@@ -484,17 +484,19 @@ Status FlowUnitGroup::Open(const CreateExternalDataFunc &create_func) {
   executor_->SetNeedCheckOutput(need_check_output);
   return status;
 }
-
+std::mutex mutext;
 Status FlowUnitGroup::Close() {
+  std::lock_guard<std::mutex> lock(mutext);
   auto status = STATUS_OK;
   for (auto &flowunit : flowunit_group_) {
     if (!flowunit) {
       MBLOG_WARN << "flow unit is nullptr.";
       continue;
     }
-
+    MBLOG_ERROR << "test ....:" << flowunit;
     auto flowunit_desc = flowunit->GetFlowUnitDesc();
     try {
+      MBLOG_ERROR << "name: " << flowunit_desc->GetFlowUnitName();
       status = flowunit->Close();
     } catch (const std::exception &e) {
       status = {STATUS_FAULT, flowunit_desc->GetFlowUnitName() +

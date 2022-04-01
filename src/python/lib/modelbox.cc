@@ -19,9 +19,11 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
+#include <pybind11/complex.h>
 
 #include <chrono>
 #include <functional>
+#include <pybind11/functional.h>
 
 #include "modelbox/python/log.h"
 #include "modelbox_api.h"
@@ -150,6 +152,10 @@ void SetUpFlow(pybind11::module &m) {
            py::overload_cast<std::shared_ptr<Configuration>>(
                &modelbox::Flow::Init),
            py::call_guard<py::gil_scoped_release>())
+      .def("init",
+           py::overload_cast<const std::shared_ptr<FlowGraphDesc> &>(
+               &modelbox::Flow::Init),
+           py::call_guard<py::gil_scoped_release>())
       .def("build", &modelbox::Flow::Build,
            py::call_guard<py::gil_scoped_release>())
       .def("run", &modelbox::Flow::Run,
@@ -179,6 +185,8 @@ PYBIND11_MODULE(_modelbox, m) {
   ModelboxPyApiSetUpGeneric(m);
   ModelboxPyApiSetUpEngine(m);
   ModelboxPyApiSetUpDataHandler(m);
+  ModelboxPyApiSetUpNodeDesc(m);
+  ModelboxPyApiSetUpFlowGraphDesc(m);
 
 #ifdef VERSION_INFO
   m.attr("__version__") = VERSION_INFO;
